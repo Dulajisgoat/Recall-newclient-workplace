@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recall — Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-light: #f0f2f5;
+    --glass-dark: rgba(255, 255, 255, 0.65);
+    --glass-light: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(200, 30, 50, 0.2);
+    --glass-highlight: rgba(255, 255, 255, 0.9);
+    
+    --glass-saturation: 180%;
+    --glass-blur: 20px;
+    --glass-blur-heavy: 40px;
+    --glass-inner-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 -1px 1px rgba(168, 44, 69, 0.1);
+    --glass-drop-shadow: 0 8px 32px rgba(168, 44, 69, 0.08), 0 2px 8px rgba(168, 44, 69, 0.05);
+    
+    --red-deep: #C41E3A;
+    --red-bright: #FF2400;
+    --red-glow: rgba(255, 36, 0, 0.4);
+    
+    --text-red: #C41E3A;
+    --text-dark-red: #8B0000;
+    --text-white: #FFFFFF;
+    --text-muted: #A0A0A0;
+  }
+
+  * { 
+    box-sizing: border-box; 
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Manrope', -apple-system, 'Segoe UI', Helvetica, sans-serif;
+    font-size: 11pt;
+    line-height: 1.65;
+    color: var(--text-red);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--bg-light);
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Liquid Glass Background Elements */
+  .glass-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background: 
+      radial-gradient(circle at 10% 10%, rgba(255, 36, 0, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(196, 30, 58, 0.08) 0%, transparent 45%),
+      #f0f2f5;
+    overflow: hidden;
+  }
+
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.3;
+    animation: floatOrb 20s infinite ease-in-out;
+  }
+
+  .orb-1 { width: 400px; height: 400px; background: var(--red-deep); top: -100px; left: -100px; }
+  .orb-2 { width: 300px; height: 300px; background: var(--red-bright); bottom: -50px; right: -50px; animation-delay: -5s; }
+  .orb-3 { width: 200px; height: 200px; background: #FF6B6B; top: 40%; left: 40%; animation-delay: -10s; }
+
+  /* Auth Card */
+  .auth-card {
+    background: var(--glass-dark);
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: var(--glass-drop-shadow), var(--glass-inner-shadow);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--glass-highlight), transparent);
+  }
+
+  .auth-card::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  .auth-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Logo */
+  .logo {
+    width: 72px;
+    height: 72px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 32px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 42px;
+    font-weight: 600;
+    color: var(--red-deep);
+    box-shadow: 0 8px 24px rgba(196, 30, 58, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: -0.04em;
+  }
+
+  .logo::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Typography */
+  .auth-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-dark-red);
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .auth-subtitle {
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: var(--text-red);
+    text-align: center;
+    margin-bottom: 32px;
+    opacity: 0.8;
+  }
+
+  /* Toggle */
+  .auth-toggle {
+    display: flex;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 32px;
+    position: relative;
+    border: 1px solid var(--glass-border);
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-red);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.02em;
+  }
+
+  .toggle-btn.active {
+    color: var(--text-white);
+  }
+
+  .toggle-slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-bright) 100%);
+    border-radius: 8px;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+  }
+
+  .toggle-slider.right {
+    transform: translateX(100%);
+  }
+
+  /* Form */
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .input-group {
+    position: relative;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark-red);
+    outline: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .input-field:focus {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: var(--red-bright);
+    box-shadow: 0 0 0 4px rgba(255, 36, 0, 0.1);
+  }
+
+  .input-field::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-bright) 100%);
+    border: none;
+    border-radius: 14px;
+    color: var(--text-white);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(196, 20, 58, 0.3);
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(196, 20, 58, 0.4);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Secondary Action */
+  .secondary-action {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--text-red);
+  }
+
+  .secondary-action button {
+    background: none;
+    border: none;
+    color: var(--red-bright);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    font-size: 13px;
+    transition: opacity 0.3s ease;
+  }
+
+  .secondary-action button:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  /* Form State */
+  .form-section {
+    display: none;
+  }
+
+  .form-section.active {
+    display: block;
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .hidden-field {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.3s ease, margin 0.3s ease;
+    margin: 0;
+  }
+
+  .hidden-field.visible {
+    max-height: 80px;
+    opacity: 1;
+  }
+
+  /* Keyframe Animations */
+  @keyframes fadeIn { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+  }
+  
+  @keyframes fadeUp { 
+    from { opacity: 0; transform: translateY(20px); } 
+    to { opacity: 1; transform: translateY(0); } 
+  }
+  
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(30px, 30px); }
+    50% { transform: translate(-20px, 40px); }
+    75% { transform: translate(20px, -30px); }
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .auth-card {
+      padding: 36px 24px;
+    }
+    .auth-title {
+      font-size: 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="glass-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="auth-card">
+  <div class="auth-content">
+    
+    <!-- R Logo with white background -->
+    <div class="logo">R</div>
+    
+    <h1 class="auth-title" id="formTitle">Welcome Back</h1>
+    <p class="auth-subtitle" id="formSubtitle">Sign in to continue your learning</p>
+    
+    <!-- Toggle Switch -->
+    <div class="auth-toggle">
+      <div class="toggle-slider" id="toggleSlider"></div>
+      <button class="toggle-btn active" id="loginBtn">Sign In</button>
+      <button class="toggle-btn" id="signupBtn">Sign Up</button>
+    </div>
+    
+    <!-- Login Form -->
+    <form class="auth-form form-section active" id="loginForm">
+      <div class="input-group">
+        <input type="email" class="input-field" placeholder="Email Address" required>
+      </div>
+      <div class="input-group">
+        <input type="password" class="input-field" placeholder="Password" required>
+      </div>
+      <button type="submit" class="submit-btn">Sign In</button>
+    </form>
+    
+    <!-- Sign Up Form -->
+    <form class="auth-form form-section" id="signupForm">
+      <div class="input-group">
+        <input type="text" class="input-field" placeholder="Full Name" required>
+      </div>
+      <div class="input-group">
+        <input type="email" class="input-field" placeholder="Email Address" required>
+      </div>
+      <div class="input-group">
+        <input type="password" class="input-field" placeholder="Create Password" required>
+      </div>
+      <button type="submit" class="submit-btn">Create Account</button>
+    </form>
+    
+    <p class="secondary-action">
+      <span id="secondaryText">Don't have an account?</span>
+      <button type="button" id="switchModeBtn">Sign up</button>
+    </p>
+    
+  </div>
+</div>
+
+<script>
+  const loginBtn = document.getElementById('loginBtn');
+  const signupBtn = document.getElementById('signupBtn');
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const toggleSlider = document.getElementById('toggleSlider');
+  const formTitle = document.getElementById('formTitle');
+  const formSubtitle = document.getElementById('formSubtitle');
+  const secondaryText = document.getElementById('secondaryText');
+  const switchModeBtn = document.getElementById('switchModeBtn');
+
+  function switchMode(mode) {
+    if (mode === 'login') {
+      loginBtn.classList.add('active');
+      signupBtn.classList.remove('active');
+      toggleSlider.classList.remove('right');
+      loginForm.classList.add('active');
+      signupForm.classList.remove('active');
+      formTitle.textContent = 'Welcome Back';
+      formSubtitle.textContent = 'Sign in to continue your learning';
+      secondaryText.textContent = "Don't have an account?";
+      switchModeBtn.textContent = 'Sign up';
+    } else {
+      signupBtn.classList.add('active');
+      loginBtn.classList.remove('active');
+      toggleSlider.classList.add('right');
+      signupForm.classList.add('active');
+      loginForm.classList.remove('active');
+      formTitle.textContent = 'Create Account';
+      formSubtitle.textContent = 'Start your learning journey today';
+      secondaryText.textContent = 'Already have an account?';
+      switchModeBtn.textContent = 'Sign in';
+    }
+  }
+
+  loginBtn.addEventListener('click', () => switchMode('login'));
+  signupBtn.addEventListener('click', () => switchMode('signup'));
+  switchModeBtn.addEventListener('click', () => {
+    if (loginForm.classList.contains('active')) {
+      switchMode('signup');
+    } else {
+      switchMode('login');
+    }
+  });
+
+  // Prevent actual form submission for this demo
+  [loginForm, signupForm].forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('.submit-btn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Loading...';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 1500);
+    });
+  });
+</script>
+
+</body>
+</html>
