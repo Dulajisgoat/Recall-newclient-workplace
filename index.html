@@ -339,6 +339,97 @@
     opacity: 1;
   }
 
+  /* Auth Message Box */
+  .auth-message {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 15px;
+    min-height: 20px;
+    font-weight: 500;
+    color: var(--red-bright);
+    transition: color 0.2s ease;
+  }
+  .auth-message.success { color: #2E7D32; }
+  .auth-message.loading { color: var(--red-deep); }
+
+  /* Footer Powered By */
+  .powered-footer {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(200, 30, 50, 0.15);
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-red);
+    opacity: 0.7;
+    letter-spacing: 0.05em;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .powered-footer span {
+    font-weight: 600;
+    color: var(--text-dark-red);
+  }
+
+  /* App Container (Post-Login) */
+  .app-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 40px auto;
+    background: var(--glass-dark);
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 48px;
+    box-shadow: var(--glass-drop-shadow), var(--glass-inner-shadow);
+    display: none;
+  }
+
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  
+  .app-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-bright) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  .logout-btn {
+    background: rgba(196, 30, 58, 0.1);
+    border: 1px solid var(--glass-border);
+    color: var(--red-deep);
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .logout-btn:hover {
+    background: var(--red-deep);
+    color: white;
+  }
+
   /* Keyframe Animations */
   @keyframes fadeIn { 
     from { opacity: 0; } 
@@ -375,7 +466,16 @@
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
 
-<div class="auth-card">
+<!-- ===================================================================== -->
+<!-- ⚠️ IMPORTANT NOTICE TO FUTURE DEVELOPERS ⚠️                            -->
+<!-- The Supabase integration below is STRICTLY FOR AUTHENTICATION ONLY.   -->
+<!-- It handles user Login and Registration via Edge Functions.            -->
+<!-- DO NOT mistake this for a general database. All other app data        -->
+<!-- functionality/features will be provided by future separate systems.   -->
+<!-- ===================================================================== -->
+
+<!-- Login / Signup UI -->
+<div class="auth-card" id="authCard">
   <div class="auth-content">
     
     <!-- R Logo with white background -->
@@ -394,39 +494,76 @@
     <!-- Login Form -->
     <form class="auth-form form-section active" id="loginForm">
       <div class="input-group">
-        <input type="email" class="input-field" placeholder="Email Address" required>
+        <input type="text" class="input-field" id="loginUsername" placeholder="Username" required>
       </div>
       <div class="input-group">
-        <input type="password" class="input-field" placeholder="Password" required>
+        <input type="password" class="input-field" id="loginPassword" placeholder="Password" required>
       </div>
-      <button type="submit" class="submit-btn">Sign In</button>
+      <div class="auth-message" id="loginMessage"></div>
+      <button type="submit" class="submit-btn" id="loginSubmit">Sign In</button>
     </form>
     
     <!-- Sign Up Form -->
     <form class="auth-form form-section" id="signupForm">
       <div class="input-group">
-        <input type="text" class="input-field" placeholder="Full Name" required>
+        <input type="text" class="input-field" id="signupUsername" placeholder="Username" required>
       </div>
       <div class="input-group">
-        <input type="email" class="input-field" placeholder="Email Address" required>
+        <input type="password" class="input-field" id="signupPassword" placeholder="Create Password" required>
       </div>
-      <div class="input-group">
-        <input type="password" class="input-field" placeholder="Create Password" required>
-      </div>
-      <button type="submit" class="submit-btn">Create Account</button>
+      <div class="auth-message" id="signupMessage"></div>
+      <button type="submit" class="submit-btn" id="signupSubmit">Create Account</button>
     </form>
     
     <p class="secondary-action">
       <span id="secondaryText">Don't have an account?</span>
       <button type="button" id="switchModeBtn">Sign up</button>
     </p>
+
+    <div class="powered-footer">
+      powered by <span>UniClvrPass</span>
+    </div>
     
   </div>
 </div>
 
+<!-- Main App UI (Loads after Login) -->
+<div class="app-container" id="appContainer">
+  <div class="app-header">
+    <div class="app-user-info">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <div>
+        <div style="font-weight: 600; color: var(--text-dark-red); font-family: 'Space Grotesk', sans-serif;" id="appUsername">user</div>
+        <div style="font-size: 12px; color: var(--text-red); opacity: 0.8;">Recall Workspace</div>
+      </div>
+    </div>
+    <button class="logout-btn" id="logoutBtn">Sign out</button>
+  </div>
+  
+  <!-- Future App Functionality Goes Here -->
+  <div style="text-align: center; padding: 40px 0; color: var(--text-red); opacity: 0.7;">
+    <h2 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 10px;">Welcome to Recall</h2>
+    <p>Your learning journey continues here. (App features to be added)</p>
+  </div>
+</div>
+
 <script>
-  const loginBtn = document.getElementById('loginBtn');
-  const signupBtn = document.getElementById('signupBtn');
+  // =====================================================================
+  // ⚠️ SUPABASE AUTH CONFIGURATION ⚠️
+  // This API endpoint is ONLY for user authentication (Login/Register).
+  // Do not use this for fetching or saving app data. 
+  // =====================================================================
+  const SUPABASE_FUNCTIONS_URL = 'https://lbujqhnadkwqgojbhalw.supabase.co/functions/v1';
+  
+  function getApiUrl(action) {
+    return (action === 'login' || action === 'register')
+      ? `${SUPABASE_FUNCTIONS_URL}/auth`
+      : `${SUPABASE_FUNCTIONS_URL}/manage-organizations`; // Left intact for routing consistency, but unused in this stripped UI
+  }
+
+  /* ---------- UI Element References ---------- */
+  const loginBtnTab = document.getElementById('loginBtn');
+  const signupBtnTab = document.getElementById('signupBtn');
   const loginForm = document.getElementById('loginForm');
   const signupForm = document.getElementById('signupForm');
   const toggleSlider = document.getElementById('toggleSlider');
@@ -435,10 +572,11 @@
   const secondaryText = document.getElementById('secondaryText');
   const switchModeBtn = document.getElementById('switchModeBtn');
 
+  /* ---------- UI Toggle Logic ---------- */
   function switchMode(mode) {
     if (mode === 'login') {
-      loginBtn.classList.add('active');
-      signupBtn.classList.remove('active');
+      loginBtnTab.classList.add('active');
+      signupBtnTab.classList.remove('active');
       toggleSlider.classList.remove('right');
       loginForm.classList.add('active');
       signupForm.classList.remove('active');
@@ -447,8 +585,8 @@
       secondaryText.textContent = "Don't have an account?";
       switchModeBtn.textContent = 'Sign up';
     } else {
-      signupBtn.classList.add('active');
-      loginBtn.classList.remove('active');
+      signupBtnTab.classList.add('active');
+      loginBtnTab.classList.remove('active');
       toggleSlider.classList.add('right');
       signupForm.classList.add('active');
       loginForm.classList.remove('active');
@@ -459,30 +597,117 @@
     }
   }
 
-  loginBtn.addEventListener('click', () => switchMode('login'));
-  signupBtn.addEventListener('click', () => switchMode('signup'));
+  loginBtnTab.addEventListener('click', () => switchMode('login'));
+  signupBtnTab.addEventListener('click', () => switchMode('signup'));
   switchModeBtn.addEventListener('click', () => {
-    if (loginForm.classList.contains('active')) {
-      switchMode('signup');
-    } else {
-      switchMode('login');
-    }
+    if (loginForm.classList.contains('active')) switchMode('signup');
+    else switchMode('login');
   });
 
-  // Prevent actual form submission for this demo
-  [loginForm, signupForm].forEach(form => {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const btn = form.querySelector('.submit-btn');
-      const originalText = btn.textContent;
-      btn.textContent = 'Loading...';
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.disabled = false;
-      }, 1500);
-    });
+  /* ---------- Message Helper ---------- */
+  function showMessage(elementId, text, type = 'error') {
+    const msgEl = document.getElementById(elementId);
+    msgEl.textContent = text;
+    msgEl.className = `auth-message ${type}`;
+  }
+
+  /* ---------- Session Management ---------- */
+  function getStoredSession() {
+    try {
+      const userId = localStorage.getItem('userId');
+      const username = localStorage.getItem('username');
+      const authToken = localStorage.getItem('authToken');
+      if (userId && username && authToken) return { userId, username, authToken };
+    } catch {}
+    return null;
+  }
+
+  function clearSession() {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    localStorage.removeItem('authToken');
+  }
+
+  function enterApp() {
+    const session = getStoredSession();
+    if (!session) return;
+
+    document.getElementById('authCard').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('appUsername').textContent = session.username;
+    document.getElementById('userAvatar').textContent = session.username.charAt(0).toUpperCase();
+  }
+
+  function showLogin() {
+    document.getElementById('appContainer').style.display = 'none';
+    document.getElementById('authCard').style.display = 'block';
+  }
+
+  /* ---------- Auth API Calls ---------- */
+  async function authAction(action) {
+    const isLogin = action === 'login';
+    const username = document.getElementById(isLogin ? 'loginUsername' : 'signupUsername').value.trim();
+    const password = document.getElementById(isLogin ? 'loginPassword' : 'signupPassword').value.trim();
+    const messageEl = isLogin ? 'loginMessage' : 'signupMessage';
+    const submitBtn = document.getElementById(isLogin ? 'loginSubmit' : 'signupSubmit');
+
+    if (!username || !password) {
+      showMessage(messageEl, 'Please enter both username and password');
+      return;
+    }
+
+    showMessage(messageEl, 'Processing...', 'loading');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Loading...';
+
+    try {
+      const response = await fetch(getApiUrl(action), {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, username, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showMessage(messageEl, `HTTP ${response.status}: ${data.error || 'Server error'}`);
+        return;
+      }
+
+      if (data.success) {
+        showMessage(messageEl, 
+          action === 'register' ? 'Account created — welcome to Recall' : 'Welcome back to Recall', 
+          'success'
+        );
+        localStorage.setItem('userId', data.userId);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('authToken', data.token);
+        setTimeout(() => enterApp(), 700);
+      } else {
+        showMessage(messageEl, data.error || 'Authentication failed');
+      }
+    } catch (error) {
+      showMessage(messageEl, 'Error: ' + error.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = isLogin ? 'Sign In' : 'Create Account';
+    }
+  }
+
+  loginForm.addEventListener('submit', (e) => { e.preventDefault(); authAction('login'); });
+  signupForm.addEventListener('submit', (e) => { e.preventDefault(); authAction('register'); });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    clearSession();
+    showLogin();
   });
+
+  /* ---------- Boot ---------- */
+  (function boot() {
+    if (getStoredSession()) enterApp();
+    else showLogin();
+  })();
 </script>
 
 </body>
