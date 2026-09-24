@@ -10,16 +10,12 @@
 <style>
   :root {
     --bg-light: #f0f2f5;
-    --glass-dark: rgba(255, 255, 255, 0.65);
-    --glass-light: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(200, 30, 50, 0.2);
+    --glass-border: rgba(255, 255, 255, 0.4);
     --glass-highlight: rgba(255, 255, 255, 0.9);
     
-    --glass-saturation: 180%;
-    --glass-blur: 20px;
     --glass-blur-heavy: 40px;
-    --glass-inner-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 -1px 1px rgba(168, 44, 69, 0.1);
-    --glass-drop-shadow: 0 8px 32px rgba(168, 44, 69, 0.08), 0 2px 8px rgba(168, 44, 69, 0.05);
+    --glass-inner-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(168, 44, 69, 0.1);
+    --glass-drop-shadow: 0 12px 40px rgba(168, 44, 69, 0.12), 0 2px 8px rgba(168, 44, 69, 0.05);
     
     --red-deep: #C41E3A;
     --red-bright: #FF2400;
@@ -28,7 +24,7 @@
     --text-red: #C41E3A;
     --text-dark-red: #8B0000;
     --text-white: #FFFFFF;
-    --text-muted: #A0A0A0;
+    --text-muted: #7a7a7a;
   }
 
   * { 
@@ -84,13 +80,14 @@
   .orb-2 { width: 300px; height: 300px; background: var(--red-bright); bottom: -50px; right: -50px; animation-delay: -5s; }
   .orb-3 { width: 200px; height: 200px; background: #FF6B6B; top: 40%; left: 40%; animation-delay: -10s; }
 
-  /* Auth Card */
+  /* Auth Card (Apple Liquid Glass Interface) */
   .auth-card {
-    background: var(--glass-dark);
-    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
-    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    background: rgba(255, 255, 255, 0.25); /* Translucent so the orb is visible underneath */
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
+    /* SVG displacement filter added inline in HTML for that liquid refraction look */
     border: 1px solid var(--glass-border);
-    border-radius: 24px;
+    border-radius: 32px;
     padding: 48px 40px;
     width: 100%;
     max-width: 440px;
@@ -105,6 +102,7 @@
     position: absolute;
     top: 0; left: 0; right: 0; height: 1px;
     background: linear-gradient(90deg, transparent, var(--glass-highlight), transparent);
+    z-index: 2;
   }
 
   .auth-card::after {
@@ -114,6 +112,7 @@
     width: 200%; height: 200%;
     background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 40%);
     pointer-events: none;
+    z-index: 0;
   }
 
   .auth-content {
@@ -172,8 +171,10 @@
   /* Toggle */
   .auth-toggle {
     display: flex;
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
     padding: 4px;
     margin-bottom: 32px;
     position: relative;
@@ -185,7 +186,7 @@
     padding: 10px 16px;
     background: transparent;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-family: 'Space Grotesk', sans-serif;
     font-size: 13px;
     font-weight: 600;
@@ -208,7 +209,7 @@
     width: calc(50% - 4px);
     height: calc(100% - 8px);
     background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-bright) 100%);
-    border-radius: 8px;
+    border-radius: 12px;
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
   }
@@ -231,7 +232,9 @@
   .input-field {
     width: 100%;
     padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--glass-border);
     border-radius: 14px;
     font-family: 'Manrope', sans-serif;
@@ -239,12 +242,10 @@
     color: var(--text-dark-red);
     outline: none;
     transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
   }
 
   .input-field:focus {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.6);
     border-color: var(--red-bright);
     box-shadow: 0 0 0 4px rgba(255, 36, 0, 0.1);
   }
@@ -356,7 +357,7 @@
   .powered-footer {
     margin-top: 32px;
     padding-top: 20px;
-    border-top: 1px solid rgba(200, 30, 50, 0.15);
+    border-top: 1px solid var(--glass-border);
     text-align: center;
     font-size: 12px;
     color: var(--text-red);
@@ -374,11 +375,11 @@
     width: 100%;
     max-width: 800px;
     margin: 40px auto;
-    background: var(--glass-dark);
-    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
-    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
     border: 1px solid var(--glass-border);
-    border-radius: 24px;
+    border-radius: 32px;
     padding: 48px;
     box-shadow: var(--glass-drop-shadow), var(--glass-inner-shadow);
     display: none;
@@ -457,14 +458,58 @@
       font-size: 24px;
     }
   }
+
+  /* ========================================================= */
+  /* Floating "R" Orb - Moves in a specific figure-8 pattern   */
+  /* ========================================================= */
+  .floating-r-orb {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    margin-top: -25px;
+    margin-left: -25px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--red-bright), var(--red-deep));
+    box-shadow: 0 0 30px var(--red-glow), inset 0 2px 5px rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    z-index: 0; /* Kept at 0 so the glass card sits on top and blurs it */
+    pointer-events: none;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .floating-r-orb.flash {
+    background: radial-gradient(circle at 35% 35%, #66ff66, #00cc00);
+    box-shadow: 0 0 60px rgba(0, 255, 0, 0.7), 0 0 100px rgba(0, 255, 0, 0.4);
+  }
 </style>
 </head>
 <body>
+
+<!-- SVG Liquid Glass Displacement Filter -->
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden;">
+  <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="92" result="noise" />
+    <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+    <feDisplacementMap in="SourceGraphic" in2="blurred" scale="70" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
 
 <div class="glass-bg"></div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
+
+<!-- Floating R Orb -->
+<div class="floating-r-orb" id="rOrb">R</div>
 
 <!-- ===================================================================== -->
 <!-- ⚠️ IMPORTANT NOTICE TO FUTURE DEVELOPERS ⚠️                            -->
@@ -474,7 +519,7 @@
 <!-- functionality/features will be provided by future separate systems.   -->
 <!-- ===================================================================== -->
 
-<!-- Login / Signup UI -->
+<!-- Login / Signup UI (Applied Apple Liquid Glass Interface) -->
 <div class="auth-card" id="authCard">
   <div class="auth-content">
     
@@ -707,6 +752,64 @@
   (function boot() {
     if (getStoredSession()) enterApp();
     else showLogin();
+  })();
+
+  // =====================================================================
+  // Floating "R" Orb Logic
+  // Moves smoothly in a specific continuous figure-8 (lemniscate) pattern.
+  // Has a 1/100 chance per cycle pass to briefly flash green.
+  // =====================================================================
+  (function initROrb() {
+    const rOrb = document.getElementById('rOrb');
+    let time = 0;
+    let speed = 0.01;
+    let nextFlashChance = 0;
+    let flashState = null;
+    let flashStartTime = 0;
+    
+    function animateOrb() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const centerX = w / 2;
+      const centerY = h / 2;
+      
+      // Specific Pattern: Figure-8 (Lemniscate of Gerono)
+      // x = A * cos(t), y = B * sin(2t) / 2
+      // This creates a continuous smooth "specific pattern" rotation around the center
+      const radiusX = w * 0.35;
+      const radiusY = h * 0.3;
+      
+      const x = centerX + radiusX * Math.cos(time);
+      const y = centerY + radiusY * Math.sin(2 * time) / 2;
+      
+      // Update Orb Position
+      rOrb.style.transform = `translate(${x}px, ${y}px)`;
+      
+      // Check for flash chance when the orb completes a full "loop" (passing the center)
+      // cos(t) is close to 0 when t is near pi/2 or 3pi/2 (the center cross of the 8)
+      const cycleMod = time % Math.PI;
+      if (cycleMod > Math.PI / 2 - 0.05 && cycleMod < Math.PI / 2 + 0.05 && time > nextFlashChance) {
+        nextFlashChance = time + Math.PI - 0.1; // Wait until the next pass to check again
+        
+        // 1 in 100 chance
+        if (Math.floor(Math.random() * 100) === 0) {
+          flashState = true;
+          flashStartTime = time;
+          rOrb.classList.add('flash');
+        }
+      }
+      
+      // If flashing, wait ~0.5 seconds before going back to continuing the rotation
+      if (flashState && time > flashStartTime + 0.5) {
+        flashState = false;
+        rOrb.classList.remove('flash');
+      }
+      
+      time += speed;
+      requestAnimationFrame(animateOrb);
+    }
+    
+    animateOrb();
   })();
 </script>
 
