@@ -490,6 +490,28 @@
     background: radial-gradient(circle at 35% 35%, #66ff66, #00cc00);
     box-shadow: 0 0 60px rgba(0, 255, 0, 0.7), 0 0 100px rgba(0, 255, 0, 0.4);
   }
+
+  /* After-image trail for the Floating "R" Orb - matches its glow/gradient */
+  .r-orb-echo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    margin-top: -25px;
+    margin-left: -25px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--red-bright), var(--red-deep));
+    box-shadow: 0 0 30px var(--red-glow);
+    z-index: 0;
+    pointer-events: none;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .r-orb-echo.flash {
+    background: radial-gradient(circle at 35% 35%, #66ff66, #00cc00);
+    box-shadow: 0 0 60px rgba(0, 255, 0, 0.7), 0 0 100px rgba(0, 255, 0, 0.4);
+  }
 </style>
 </head>
 <body>
@@ -507,6 +529,13 @@
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
+
+<!-- Floating R Orb after-image trail -->
+<div class="r-orb-echo" id="rOrbEcho0" style="opacity: 0.45;"></div>
+<div class="r-orb-echo" id="rOrbEcho1" style="opacity: 0.32;"></div>
+<div class="r-orb-echo" id="rOrbEcho2" style="opacity: 0.20;"></div>
+<div class="r-orb-echo" id="rOrbEcho3" style="opacity: 0.11;"></div>
+<div class="r-orb-echo" id="rOrbEcho4" style="opacity: 0.05;"></div>
 
 <!-- Floating R Orb -->
 <div class="floating-r-orb" id="rOrb">R</div>
@@ -761,6 +790,16 @@
   // =====================================================================
   (function initROrb() {
     const rOrb = document.getElementById('rOrb');
+    const echoes = [
+      document.getElementById('rOrbEcho0'),
+      document.getElementById('rOrbEcho1'),
+      document.getElementById('rOrbEcho2'),
+      document.getElementById('rOrbEcho3'),
+      document.getElementById('rOrbEcho4')
+    ];
+    const echoDelaySteps = 3; // frames of gap between each echo
+    const posHistory = [];
+    const posHistoryMax = echoDelaySteps * echoes.length + 1;
     let time = 0;
     let speed = 0.01;
     let nextFlashChance = 0;
@@ -784,6 +823,16 @@
       
       // Update Orb Position
       rOrb.style.transform = `translate(${x}px, ${y}px)`;
+
+      // Record position history and update the after-image trail
+      posHistory.unshift({ x, y });
+      if (posHistory.length > posHistoryMax) posHistory.length = posHistoryMax;
+
+      echoes.forEach((echo, i) => {
+        const delayIndex = (i + 1) * echoDelaySteps;
+        const p = posHistory[delayIndex] || posHistory[posHistory.length - 1];
+        if (p) echo.style.transform = `translate(${p.x}px, ${p.y}px)`;
+      });
       
       // Check for flash chance when the orb completes a full "loop" (passing the center)
       // cos(t) is close to 0 when t is near pi/2 or 3pi/2 (the center cross of the 8)
@@ -796,6 +845,7 @@
           flashState = true;
           flashStartTime = time;
           rOrb.classList.add('flash');
+          echoes.forEach(echo => echo.classList.add('flash'));
         }
       }
       
@@ -803,6 +853,7 @@
       if (flashState && time > flashStartTime + 0.5) {
         flashState = false;
         rOrb.classList.remove('flash');
+        echoes.forEach(echo => echo.classList.remove('flash'));
       }
       
       time += speed;
